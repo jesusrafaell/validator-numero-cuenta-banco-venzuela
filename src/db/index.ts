@@ -1,19 +1,16 @@
 import { config } from 'mssql';
+import { config as configEnv } from 'dotenv';
+configEnv();
 
-const db: config = {
-	user: 'amendoza',
-	password: 'Am1523246.',
-	database: 'librepago',
-	server: '10.198.72.11',
-	// pool: {
-	// 	max: 10,
-	// 	min: 0,
-	// 	idleTimeoutMillis: 30000,
-	// },
+const sqlConfig: config = {
+	user: process.env.USER,
+	password: process.env.PASSWORD,
+	database: process.env.DATABASE,
+	server: process.env.SERVER!,
 	options: {
-		encrypt: true,
+		encrypt: false,
 		trustServerCertificate: true,
 	},
 };
 
-export default db;
+export default sqlConfig;

@@ -1,6 +1,7 @@
 import sql from 'mssql';
 import db from '../db';
 import Abonos from '../db/models/abono.entity';
+import Bancos from '../db/models/bancos.entity';
 import { isValid, isValidExpresion } from './validAcoountBank';
 
 export interface Invalids {
@@ -19,13 +20,12 @@ export interface InvalidsWithCommerce {
 
 export function getAccountsInvalid(array: Abonos[]) {
 	let list: Invalids[] = [];
-	array.forEach((item: Abonos, index) => {
+	array.forEach((item: Abonos) => {
 		const { aboTerminal, aboNroCuenta, aboCodComercio } = item;
 		if (isValidExpresion(aboNroCuenta)) {
-			if (!isValid(aboNroCuenta))
-				list.push({ aboTerminal, aboNroCuenta, aboCodComercio, msg: 'Codigo de control invalido' });
+			if (!isValid(aboNroCuenta)) list.push({ aboTerminal, aboNroCuenta, aboCodComercio, msg: 'cc_invalido' });
 		} else {
-			list.push({ aboTerminal, aboNroCuenta, aboCodComercio, msg: 'Longitud invalida' });
+			list.push({ aboTerminal, aboNroCuenta, aboCodComercio, msg: 'longitud_invalida' });
 		}
 	});
 	return list;

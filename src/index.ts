@@ -1,4 +1,4 @@
-import db from './db';
+import sqlConfig from './db';
 import sql from 'mssql';
 import Abonos from './db/models/abono.entity';
 import {
@@ -8,37 +8,28 @@ import {
 	InvalidsWithCommerce,
 } from './functions/getAccountsInvalid';
 import fs from 'fs';
-
-const test: string[] = [
-	'01340497634971022797', //si
-	'01020251580100014512', //si
-	'01340365163651030134', //no
-	'01020345300000670346', //no
-	'01340365163651030134', //no
-	'010201454500012218881', //no
-	'010209301500001360001', //no
-];
-
-//test.forEach((st, index) => console.log(st, index + 1, isValid(st)));
+import { config as configEnv } from 'dotenv';
+configEnv();
 
 async function getListAccounts(): Promise<Abonos[]> {
 	try {
-		await sql.connect(db);
+		await sql.connect(sqlConfig);
 		console.log('Connected DB');
-		const result = await sql.query`select * from abonos`;
-		return result.recordset;
+		const resultAbono = await sql.query`select * from abonos`;
+		return resultAbono.recordset;
 	} catch (err) {
 		console.log(err);
 		process.exit();
 	}
 }
 
-const file = fs.createWriteStream('my_data.txt');
+const nameFile: string = process.env.RUTA + new Date().toISOString().split('T')[0] + '.txt';
+const file = fs.createWriteStream(nameFile);
 
 async function main() {
-	const accounts: Abonos[] = await getListAccounts();
-	console.log('Total Abonos', accounts.length);
-	const invalids: Invalids[] = getAccountsInvalid(accounts);
+	const cuentas = await getListAccounts();
+	console.log('Total Abonos', cuentas.length);
+	const invalids: Invalids[] = getAccountsInvalid(cuentas);
 	console.log('Total cuentas invalidas', invalids.length);
 	//console.log(invalids);
 	const invalidsWithCommerce: InvalidsWithCommerce[] = await getListAccountsWithCommerce(invalids);
@@ -64,3 +55,17 @@ async function main() {
 }
 
 main();
+
+/*
+const test: string[] = [
+	'01340497634971022797', //si
+	'01020251580100014512', //si
+	'01340365163651030134', //no
+	'01020345300000670346', //no
+	'01340365163651030134', //no
+	'010201454500012218881', //no
+	'010209301500001360001', //no
+];
+*/
+
+//test.forEach((st, index) => console.log(st, index + 1, isValid(st)));
