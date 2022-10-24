@@ -23,7 +23,7 @@ function getDigitoVerificador(entidad: string, sucursal: string, cuenta: string)
 }
 
 export function isValid(account_number: string): boolean {
-	if (!/^[0-9]{20}$/.test(account_number)) return false;
+	//if (!/^[0-9]{20}$/.test(account_number)) return false;
 
 	const entidad: string = account_number.slice(0, 4);
 	const sucursal: string = account_number.slice(4, 8);
@@ -34,4 +34,9 @@ export function isValid(account_number: string): boolean {
 	if (calculo == dc) return true;
 
 	return false;
+}
+
+export function isValidExpresion(account_number: string): boolean {
+	if (!/^[0-9]{20}$/.test(account_number)) return false;
+	return true;
 }

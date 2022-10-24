@@ -1,6 +1,13 @@
 import db from './db';
-import getAccountNumber from './db/querys/getAccountNumber';
-import { isValid } from './functions/validAcoountBank';
+import sql from 'mssql';
+import Abonos from './db/models/abono.entity';
+import {
+	getAccountsInvalid,
+	getListAccountsWithCommerce,
+	Invalids,
+	InvalidsWithCommerce,
+} from './functions/getAccountsInvalid';
+import fs from 'fs';
 
 const test: string[] = [
 	'01340497634971022797', //si
@@ -12,12 +19,48 @@ const test: string[] = [
 	'010209301500001360001', //no
 ];
 
-test.forEach((st, index) => console.log(st, index + 1, isValid(st)));
+//test.forEach((st, index) => console.log(st, index + 1, isValid(st)));
 
-//init
-db.connect((err) => {
-	if (err) throw err;
-	console.log('Connected!');
-	const abonos = getAccountNumber(db);
-	console.log('abonos index', abonos);
-});
+async function getListAccounts(): Promise<Abonos[]> {
+	try {
+		await sql.connect(db);
+		console.log('Connected DB');
+		const result = await sql.query`select * from abonos`;
+		return result.recordset;
+	} catch (err) {
+		console.log(err);
+		process.exit();
+	}
+}
+
+const file = fs.createWriteStream('my_data.txt');
+
+async function main() {
+	const accounts: Abonos[] = await getListAccounts();
+	console.log('Total Abonos', accounts.length);
+	const invalids: Invalids[] = getAccountsInvalid(accounts);
+	console.log('Total cuentas invalidas', invalids.length);
+	//console.log(invalids);
+	const invalidsWithCommerce: InvalidsWithCommerce[] = await getListAccountsWithCommerce(invalids);
+	//console.log(invalidsWithCommerce);
+	const pathName = file.path;
+	file.on('error', (err) => {
+		console.error(`There is an error writing the file ${pathName} => ${err}`);
+		process.exit();
+	});
+	for (let i = 0; i < invalidsWithCommerce.length; i++) {
+		let value = invalidsWithCommerce[i];
+		file.write(
+			value.comerRif.padEnd(11, ' ') +
+				value.aboNroCuenta.padEnd(20, ' ') +
+				value.aboTerminal.padStart(9, ' ') +
+				` ${value.msg}` +
+				'\n'
+		);
+	}
+	file.end(() => {
+		process.exit();
+	});
+}
+
+main();

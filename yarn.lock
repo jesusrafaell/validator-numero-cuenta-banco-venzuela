@@ -220,6 +220,15 @@
   dependencies:
     "@types/node" "*"
 
+"@types/mssql@^8.1.1":
+  version "8.1.1"
+  resolved "https://registry.yarnpkg.com/@types/mssql/-/mssql-8.1.1.tgz#c46d4b9952d7aa860a7de4631771b8d304148829"
+  integrity sha512-5gNrxeTBbF9OYe+tj6FVPlBypH4B6MjmBKMtEoU7sOjbpnzi17AZ5M0ob5nQNFo+EFdopGMXlKkUdysUoZ/TRQ==
+  dependencies:
+    "@types/node" "*"
+    "@types/tedious" "*"
+    tarn "^3.0.1"
+
 "@types/mysql@^2.15.21":
   version "2.15.21"
   resolved "https://registry.yarnpkg.com/@types/mysql/-/mysql-2.15.21.tgz#7516cba7f9d077f980100c85fd500c8210bd5e45"
@@ -231,6 +240,13 @@
   version "18.11.4"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.4.tgz#7017a52e18dfaad32f55eebd539993014441949c"
   integrity sha512-BxcJpBu8D3kv/GZkx/gSMz6VnTJREBj/4lbzYOQueUOELkt8WrO6zAcSPmp9uRPEW/d+lUO8QK0W2xnS1hEU0A==
+
+"@types/tedious@*":
+  version "4.0.9"
+  resolved "https://registry.yarnpkg.com/@types/tedious/-/tedious-4.0.9.tgz#baa3892e45c63d7aac54d7bf5b01385d210ff19e"
+  integrity sha512-ipwFvfy9b2m0gjHsIX0D6NAAwGCKokzf5zJqUZHUGt+7uWVlBIy6n2eyMgiKQ8ChLFVxic/zwQUhjLYNzbHDRA==
+  dependencies:
+    "@types/node" "*"
 
 abbrev@1:
   version "1.1.1"
@@ -1137,7 +1153,7 @@ supports-color@^5.5.0:
   dependencies:
     has-flag "^3.0.0"
 
-tarn@^3.0.2:
+tarn@^3.0.1, tarn@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/tarn/-/tarn-3.0.2.tgz#73b6140fbb881b71559c4f8bfde3d9a4b3d27693"
   integrity sha512-51LAVKUSZSVfI05vjPESNc5vwqqZpbXCsU+/+wxlOrUjk2SnFTt97v9ZgQrD4YmxYW1Px6w2KjaDitCfkvgxMQ==
