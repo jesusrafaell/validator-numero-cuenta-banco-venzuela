@@ -3,6 +3,7 @@ import sql from 'mssql';
 import Abonos from './db/models/abono.entity';
 import {
 	getAccountsInvalid,
+	getListAccounts,
 	getListAccountsWithCommerce,
 	Invalids,
 	InvalidsWithCommerce,
@@ -11,47 +12,42 @@ import fs from 'fs';
 import { config as configEnv } from 'dotenv';
 configEnv();
 
-async function getListAccounts(): Promise<Abonos[]> {
-	try {
-		await sql.connect(sqlConfig);
-		console.log('Connected DB');
-		const resultAbono = await sql.query`select * from abonos`;
-		return resultAbono.recordset;
-	} catch (err) {
-		console.log(err);
-		process.exit();
-	}
-}
-
 const nameFile: string = process.env.RUTA + new Date().toISOString().split('T')[0] + '.txt';
 const file = fs.createWriteStream(nameFile);
 
 async function main() {
-	const cuentas = await getListAccounts();
-	console.log('Total Abonos', cuentas.length);
-	const invalids: Invalids[] = getAccountsInvalid(cuentas);
-	console.log('Total cuentas invalidas', invalids.length);
-	//console.log(invalids);
-	const invalidsWithCommerce: InvalidsWithCommerce[] = await getListAccountsWithCommerce(invalids);
-	//console.log(invalidsWithCommerce);
-	const pathName = file.path;
-	file.on('error', (err) => {
-		console.error(`There is an error writing the file ${pathName} => ${err}`);
-		process.exit();
-	});
-	for (let i = 0; i < invalidsWithCommerce.length; i++) {
-		let value = invalidsWithCommerce[i];
-		file.write(
-			value.comerRif.padEnd(11, ' ') +
-				value.aboNroCuenta.padEnd(20, ' ') +
-				value.aboTerminal.padStart(9, ' ') +
-				` ${value.msg}` +
-				'\n'
-		);
+	try {
+		await sql.connect(sqlConfig);
+		const cuentas = await getListAccounts();
+		console.log('Connected DB');
+		console.log('Total Abonos', cuentas.length);
+		const invalids: Invalids[] = getAccountsInvalid(cuentas);
+		console.log('Total cuentas invalidas', invalids.length);
+		//console.log(invalids);
+		const invalidsWithCommerce: InvalidsWithCommerce[] = await getListAccountsWithCommerce(invalids);
+		//console.log(invalidsWithCommerce);
+		const pathName = file.path;
+		file.on('error', (err) => {
+			console.error(`There is an error writing the file ${pathName} => ${err}`);
+			process.exit();
+		});
+		for (let i = 0; i < invalidsWithCommerce.length; i++) {
+			let value = invalidsWithCommerce[i];
+			file.write(
+				value.comerRif.padEnd(11, ' ') +
+					value.aboNroCuenta.padEnd(20, ' ') +
+					value.aboTerminal.padStart(9, ' ') +
+					` ${value.msg}` +
+					'\n'
+			);
+		}
+		file.end(() => {
+			process.exit();
+		});
+	} catch (err) {
+		console.log(err);
+		throw err;
 	}
-	file.end(() => {
-		process.exit();
-	});
 }
 
 main();

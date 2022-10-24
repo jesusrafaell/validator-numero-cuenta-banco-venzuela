@@ -1,7 +1,5 @@
 import sql from 'mssql';
-import db from '../db';
 import Abonos from '../db/models/abono.entity';
-import Bancos from '../db/models/bancos.entity';
 import { isValid, isValidExpresion } from './validAcoountBank';
 
 export interface Invalids {
@@ -42,7 +40,6 @@ async function getCommerce(comerCod: number): Promise<string> {
 }
 
 export async function getListAccountsWithCommerce(array: Invalids[]) {
-	await sql.connect(db);
 	let list: InvalidsWithCommerce[] = [];
 	for (let i = 0; i < array.length; i++) {
 		const { aboCodComercio, ...data } = array[i];
@@ -50,4 +47,14 @@ export async function getListAccountsWithCommerce(array: Invalids[]) {
 		list.push({ ...data, comerRif });
 	}
 	return list;
+}
+
+export async function getListAccounts(): Promise<Abonos[]> {
+	try {
+		const resultAbono = await sql.query`select * from abonos`;
+		return resultAbono.recordset;
+	} catch (err) {
+		console.log(err);
+		process.exit();
+	}
 }
